@@ -150,13 +150,18 @@
 
 ### T1.5 桌面浏览器 baseline 验证
 
-- **负责**：用户本地 + 我指导
+- **负责**：用户本地（手动）+ 我（CDN/HTTP 自动化 + 文档模板）
 - **动作**：
-  1. 桌面 Chrome 100+ / Firefox 100+ / Safari 15+ 各打开 URL 验证
-  2. DevTools Console 无红色报错
-  3. Phaser Game canvas 渲染正常（背景灰色 + 灰盒对象）
-- **交付物**：3 个浏览器的 DevTools Console 截图
-- **预计工时**：1 小时
+  1. 我：`curl -I` + WebFetch 验证 Pages 200 OK、HTML < 2KB、`.nojekyll` 落地、CORS `*`
+  2. 我：写 `web/TEST-RESULTS-W1.md` 模板（视觉清单 / Console 检查 / FPS baseline）
+  3. 用户：依次在 **2 个桌面浏览器** 打开 URL，各跑一次 DevTools Console 检查
+     + Performance 录制 5 秒，记下 FPS
+     - 推荐组合：Chrome + Edge（同 Win10 一台机就能跑，都是 Chromium/Blink）
+     - Safari（macOS 必需）/ Firefox 看用户是否有，没有就跳过
+  4. 用户：填测试结果到 `web/TEST-RESULTS-W1.md`，commit + push
+- **交付物**：`web/TEST-RESULTS-W1.md`（已填的测试结果 doc）
+- **预计工时**：30 分钟（我 10 分钟 + 用户 20 分钟）
+- **降级接受**：只有 1 个浏览器跑通也算 W1 baseline 满足（v1.0 ship 前再补 cross-engine）；2 浏览器过算强通过；3 浏览器过算满分
 
 ---
 
