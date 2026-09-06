@@ -40,13 +40,13 @@ describe('SelectionManager', () => {
       const map = new BattleMap({ cols, rows });
       const events = [];
       for (const evt of Object.values(SelectionEvents)) {
-        bus.on(evt, (p) => events.push({ evt, p }));
+        bus.on(evt, (payload) => events.push({ evt, payload }));
       }
       const sm = new SelectionManager({ eventBus: bus, map });
       return { bus, map, sm, events };
     }
 
-    it('click friendly unit -> select (UNIT_SELECTED)', () => {
+    it('click friendly unit -> select (UNIT_SELECTED with unitId + faction)', () => {
       const { sm, map, events } = setup();
       const u = map.spawnUnit({
         faction: PLAYER, type: UnitType.SOLDIER, position: { x: 2, y: 1 },
@@ -55,6 +55,10 @@ describe('SelectionManager', () => {
       expect(sm.selectedUnitId).toBe(u.id);
       const kinds = events.map((e) => e.evt);
       expect(kinds).toContain(SelectionEvents.UNIT_SELECTED);
+      // W2 T2.4: payload now carries faction so ActionPanel can
+      // decide move/attack enablement without re-querying BattleMap.
+      const select = events.find((e) => e.evt === SelectionEvents.UNIT_SELECTED);
+      expect(select.payload).toEqual({ unitId: u.id, faction: PLAYER });
     });
 
     it('click friendly unit twice -> emits UNIT_SELECTED once', () => {
