@@ -1,7 +1,12 @@
 # v1.0 Web 单机 Roguelike — Scope（取代 Android 单机版）
 
-> **⚠️ 状态：superseded** — v1.0 改走 Web 路线后，本文件将 Web scope 抽出后不再维护。
-> 原 Android scope 见 `docs/production/v1-android-roguelike-scope.md`（已 archived）。
+> **📌 状态：active**（2026-09-06 拍板三项关键决策；待 Sprint 1 plan 锁定后冻结）
+> - ✅ 部署 URL：`346318599.github.io/animal-civ`（GitHub Pages）
+> - ✅ v1.0 含触屏适配（移动端浏览器原生支持，虚拟摇杆 + 大点击区）
+> - ⏸ Sprint 1 plan：等本 scope 审完后再开工
+>
+> 取代对象：`docs/production/v1-android-roguelike-scope.md`（已 archived / SUPERSEDED）。
+> 取代原因：Unity Hub 3.21.1 要求 Win10 21H1+，本机 2004 (build 19041) 卡死。
 
 ---
 
@@ -39,7 +44,7 @@
 | 测试 | **Vitest** (Node) | 跑 game logic 单测（与 Phaser 视图层解耦） |
 | Lint / Format | ESLint + Prettier（可选） | 后续接入 |
 | Dev Server | **Vite** (可选) | 跑 Vitest + 起本地静态 server，**不影响生产构建** |
-| 部署 | 静态网站 | workbuddy.cn/sites publish / GitHub Pages / Vercel / Netlify / 本地 `index.html` 双击 |
+| 部署 | **GitHub Pages（独立 repo）** | `346318599/animal-civ` → `346318599.github.io/animal-civ`；URL 路径 `/animal-civ` 必须是 repo 名，因此不能复用 my-game fork 的子目录 |
 | 后端 | **None** | 纯前端，v1.0 不含 PvP / 云存档 |
 
 ### 文件结构（计划）
@@ -48,6 +53,7 @@
 my-game/
 ├── web/                              ← NEW: 实际游戏代码（生产部署目录）
 │   ├── index.html                    # Phaser 入口 + boot
+│   ├── .nojekyll                     # GitHub Pages: 关掉 Jekyll 处理（保留 _ 开头目录）
 │   ├── styles.css
 │   ├── js/
 │   │   ├── main.js                   # Phaser config + scene 引导
@@ -119,7 +125,7 @@ my-game/
 | 引擎 | Unity 6 LTS / URP 2D | Phaser 3 |
 | 语言 | C# 9 / .NET Standard 2.1 | JS ES2022 |
 | 构建 | APK (arm64-v8a, IL2CPP) | 静态 .html/.js/.css 包 |
-| 分发 | Play Store | GitHub Pages / workbuddy sites |
+| 分发 | Play Store | GitHub Pages（独立 repo `346318599/animal-civ`） |
 | 输入 | 触屏为主 | 桌面鼠标键盘 + 移动触屏 |
 | 测试 | NUnit / Unity Test Runner | Vitest (Node) |
 | 单包大小限制 | < 80 MB APK | < 5 MB（首次加载），lazy load 资源 |
@@ -182,23 +188,95 @@ FactionSelect → 地图生成 (WFC) → BattleScene 进入 →
 
 | 风险 | 等级 | 缓解 |
 |---|---|---|
-| Phaser 3 渲染在低端移动浏览器掉到 < 30fps | 中 | W4 强制测 1 台 Android 真机浏览器 |
-| 鼠标 vs 触屏 输入范式差太大 | 中 | MobileControls 子模块强制要求触屏走虚拟摇杆 |
+| Phaser 3 渲染在低端移动浏览器掉到 < 30fps | 中 | W4 强制测 1 台 Android 真机浏览器（Chrome 100+ Mobile） |
+| 鼠标 vs 触屏 输入范式差太大 | 中 | **决策：v1.0 含触屏** — `MobileControls.js` 子模块强制走虚拟摇杆（左下虚拟摇杆移动单位 + 右下大按钮触发动作）；桌面端隐藏虚拟控件；通过 `pointer:fine` media query 切换 |
+| 触屏虚拟摇杆在 Phaser 3 上手写 vs 库的选择 | 低 | 决策：自写，约 80 行 JS（用 Phaser `pointermove` + `pointerdown` 事件 + GameObject 圆盘），避免引第三方摇杆库引入打包复杂度 |
+| 触屏 UI 在 iOS Safari 上 `touch-action` 默认行为冲突 | 中 | W2 输入层统一 `e.preventDefault()` + CSS `touch-action: none` |
 | localStorage 被清后 Meta 进度丢失 | 低 | 接受：v1.0 没云存档是显式决策 |
 | 静态资源膨胀（7 阵营灰盒 1 MB → 精装资源 50 MB+） | 低 | v1.0 严格 < 5 MB CDN 加载，v2.0 再拆分懒加载 |
 | Phaser 3.90+ 浏览器兼容（Edge Legacy / Safari 14 等老浏览器） | 低 | 目标矩阵明确锁 Chrome 100+ / FF 100+ / Safari 15+ |
 
 ---
 
-## 8. 待定项（用户决策后补）
+## 8. 已决定项（2026-09-06 拍板）
 
-- [ ] 包名 / 部署 URL：`animal-civ.web.app` / `346318599.github.io/animal-civ` / 自有域？
-- [ ] 7 阵营美术资产策略：v1.0 全部灰盒，v1.1 渐进开源免版权美术？
-- [ ] 移动端是否在 v1.0 适配？（如果只 v1.0 桌面，可省 W4 的触屏适配工时）
+| # | 项 | 决议 | 详情 |
+|---|---|---|---|
+| 1 | 部署 URL | ✅ GitHub Pages：`346318599.github.io/animal-civ` | 见 §9.1 |
+| 2 | v1.0 触屏适配 | ✅ 是（移动端原生支持） | 见 §9.2 |
+| 3 | Sprint 1 plan 排期 | ⏸ 待本 scope 审完后开工 | 见 §9.3 |
+
+### 8.1 仍可调整项（如有异议请审 scope 时提出）
+
+- 7 阵营美术资产策略：v1.0 全部灰盒 vs v1.1 渐进开源免版权美术（未拍板，不影响 Sprint 1）
 
 ---
 
-## 9. 相关链接
+## 9. 决策详情
+
+### 9.1 部署 URL = GitHub Pages `346318599.github.io/animal-civ`
+
+**理由**：
+- 用户已有 GitHub fork（`346318599/Claude-Code-Game-Studios`），Pages 复用同账号无需新申请
+- 工作流最简单：`web/` 推到 `main` 的 `gh-pages` 分支（或 `/docs` 子目录）即可自动部署
+- 免运维，无需服务器
+- CDN 加速（HTTPS + 全球节点）
+
+**实施**（Sprint 1 W1 任务）：
+- **必须新建独立 repo**：`346318599/animal-civ`（GitHub Pages 用户级 URL 规则是 `{user}.github.io/{repo}/`，要得到 `/animal-civ` 子路径，repo 名必须叫 `animal-civ`）
+  - 不能复用 `Claude-Code-Game-Studios` fork 作为 Pages source，否则 URL 变成 `346318599.github.io/Claude-Code-Game-Studios/`，路径不对
+  - 仓库内容 = `my-game/web/` 目录内容（建仓时直接 `git mv web/* .`）
+- `web/` 目录加 `.nojekyll`（关 Jekyll 处理）
+- 配置 Pages Source：Settings → Pages → Branch: `main` / Root（静态站点最简）
+- 加 GitHub Actions workflow：`web/**` push → 自动 build + 部署到 Pages（可选；v1.0 也可以手动 push main 触发 Pages 重建）
+- 自定义域名（如需要）：CNAME 文件 + DNS 解析（v1.0 不做）
+
+**my-game 仓库 vs animal-civ 仓库的内容边界**：
+- **my-game repo**（fork）：保留所有设计文档、Assets/ C# reference、Bot 行为定义等"游戏规格"内容；`web/` 目录是开发源
+- **animal-civ repo**（新建）：只放 `web/` 目录生产构建产物（HTML / JS / CSS / assets）；设计文档留在 my-game，不冗余到 animal-civ
+- **同步流程**：my-game `web/` 改动 → CI 推送到 animal-civ（git subtree 或 rsync）；或每个 W1 末手动 `git subtree push --prefix=web` 一把
+  - 推荐手动：v1.0 没高频发布，手动可控、可 review
+
+**约束**：
+- Pages 静态托管，无服务端逻辑（与 v1.0 "无后端" 决策一致）
+- 单仓库 1 GB 软限制、100 GB 流量/月软限制（v1.0 灰盒 < 5 MB 完全够）
+
+**回退方案**：若 Pages 后续受限，可迁 Vercel / Netlify（迁移成本 = 改 deploy workflow，本地 `web/` 不动）
+
+### 9.2 v1.0 含触屏适配（移动端原生支持）
+
+**理由**：
+- 用户决策（2026-09-06）："是"
+- 移动浏览器是天然触屏平台，无需额外开发平台特定应用
+- 与"v1.0 不做 PvP / 服务端 / 云存档" 一致：触屏是输入层增强，不引入新后端
+
+**触屏 UX 规范**（Sprint 1 W4 落地）：
+- **左下虚拟摇杆**：移动单位；圆形底盘 + 内圆跟随手指；松开回中
+- **右下大按钮（≥ 88×88 CSS px）**：触发选中单位的主动作（攻击 / 建造 / 防守）
+- **顶部 HUD**：触屏可点击的目标选择按钮（≥ 44×44 CSS px，符合 iOS HIG）
+- **桌面端切换**：CSS `@media (pointer: fine)` 检测精准指针（鼠标），隐藏虚拟摇杆，改用键盘 WASD + 鼠标点击
+- **iOS Safari 兼容**：CSS `touch-action: none` 阻止浏览器默认手势（滚动 / 缩放）
+
+**工时影响**：
+- 原 W4 "移动端适配" 30% 工时升级为强制任务（含虚拟摇杆 + 大点击区 + media query 切换）
+- W2 输入层需统一抽象 `PointerEvent`（Phaser 3 内建支持），桌面 + 移动共用一套代码路径
+
+**性能预算**：
+- 移动端（Chrome 100+ on Android 10+ 中端机）目标 60fps，兜底 30fps
+- W4 真机回归测试最低配置：Moto G Power / Samsung Galaxy A 系列（Snapdragon 6xx 系列）
+
+### 9.3 Sprint 1 plan 排期
+
+**当前状态**：本 scope 待用户审完，**未开工**。
+
+**下一步**：
+1. 用户审本 scope（重点：§9.1 部署方案 / §9.2 触屏规范）
+2. 用户给绿灯后，写 `sprint-1-web-plan.md`（21 任务 W1-W4 详细任务卡，对应 Android 版同名 task 但 stack 替换）
+3. W1 任务起项目（建 `web/` 目录、port BT 框架到 JS、Phaser 灰盒 demo、部署到 Pages）
+
+---
+
+## 10. 相关链接
 
 - Stage 2 设计基线（保留为 v2.0+ 全功能愿景）：
   - `docs/gdd/game-concept.md`
@@ -216,7 +294,4 @@ FactionSelect → 地图生成 (WFC) → BattleScene 进入 →
 
 ---
 
-**⚠️ 拍板条目等用户决定**：
-1. 包名 / 部署 URL 走哪个
-2. v1.0 是否含触屏适配（桌面 only 的话省 30% W4 工时）
-3. Sprint 1 web plan 锁定（提交后开始写 W1）
+**版本**：v1.0-web-scope（2026-09-06 拍板 3 项决策，待 Sprint 1 plan 锁定后冻结）
