@@ -1,4 +1,15 @@
-# v1.0 安卓单机 Roguelike 范围说明
+# v1.0 安卓单机 Roguelike 范围说明（SUPERSEDED — 已归档）
+
+> **⚠️ SUPERSEDED (2026-09-06)**：本 Android Unity 单机 scope 因本机 Win10 2004 (build 19041)
+> 卡死 Unity Hub 3.21.1（要求 21H1+ build 19043）而被取代。v1.0 改走 **Web 单机 Roguelike** 路线。
+>
+> 新 scope 见 [`v1-web-roguelike-scope.md`](./v1-web-roguelike-scope.md)。
+>
+> 本文件正文保留作为决策日志，不再维护。
+
+---
+
+# 原文（已归档）
 
 > **方向切换** (2026-09-06 拍板)：从原 Stage 2 设计基线（7 阵营 / 4X / 异步镜像 PvP /
 > Gacha / 服务端匹配）**切到 v1.0 安卓单机 Roguelike**。
