@@ -22,6 +22,28 @@ describe('BattleMap', () => {
       expect(() => new BattleMap({ cols: 4.5 })).toThrow(RangeError);
     });
 
+    it('exposes the underlying 2D tile array as m.grid (read by renderers)', () => {
+      const m = new BattleMap({ cols: 4, rows: 3 });
+      expect(m.grid).toBeDefined();
+      expect(m.grid.length).toBe(3);
+      expect(m.grid[0].length).toBe(4);
+      // Same identity as the underlying storage (live ref).
+      const t = m.grid[1][2];
+      expect(t).toBe(m.getTile(2, 1));
+      expect(t.x).toBe(2);
+      expect(t.y).toBe(1);
+    });
+
+    it('exposes m.units / m.buildings live arrays for renderer consumers', () => {
+      const m = new BattleMap({ cols: 4, rows: 3 });
+      expect(m.units).toEqual([]);
+      expect(m.buildings).toEqual([]);
+      const u = m.spawnUnit({ faction: 'panda', type: 'worker', position: { x: 1, y: 1 } });
+      expect(m.units).toContain(u);
+      const b = m.spawnBuilding({ faction: 'panda', type: 'base', position: { x: 0, y: 0 } });
+      expect(m.buildings).toContain(b);
+    });
+
     it('isInBounds covers the inclusive [0, cols) x [0, rows) range', () => {
       const m = new BattleMap({ cols: 4, rows: 3 });
       expect(m.isInBounds(0, 0)).toBe(true);
