@@ -1,0 +1,31 @@
+{
+  "name": "my-game",
+  "version": "1.0.0",
+  "description": "Animal Civ — Web 单机 Roguelike (v1.0 Sprint 1 dev: Phaser 3 game + Vitest 测试套件)",
+  "private": true,
+  "type": "module",
+  "main": "web/js/main.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage"
+  },
+  "keywords": [
+    "animal-civ",
+    "phaser3",
+    "roguelike",
+    "turn-based",
+    "vitest"
+  ],
+  "author": "346318599",
+  "license": "MIT",
+  "devDependencies": {
+    "happy-dom": "^20.14.0",
+    "vitest": "^5.0.0"
+  }
+}
